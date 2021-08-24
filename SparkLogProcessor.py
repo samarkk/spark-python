@@ -140,7 +140,7 @@ assert sorted(responseCodeToCountList) == [(200, 940847), (302, 16244), (304, 79
 # ##############################################
 
 # cache is same as StorageLevel.MEMORY_ONLY
-print(parsed_logs.getStoragLevel())
+print(parsed_logs.getStorageLevel())
 
 # persist to disk
 parsed_logs_disk_persisted = parsed_logs.map(lambda x: x).persist(StorageLevel.DISK_ONLY)
@@ -166,11 +166,11 @@ daily_requests = access_logs \
     .reduceByKey(lambda x, y: x + y)
 
 # join daily hosts and aaily requests to find the average number of requests per host
-daily_hosts \
+print(daily_hosts \
     .join(daily_requests) \
     .map(lambda x: (x[0], x[1][0], x[1][1], x[1][1] / x[1][0])) \
     .sortBy(lambda x: x[0]) \
-    .collect()
+    .collect())
 
-time.sleep(3600)
+# time.sleep(3600)
 
