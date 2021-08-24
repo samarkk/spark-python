@@ -126,11 +126,11 @@ daily_requests = access_logs \
     .reduceByKey(lambda x, y: x + y)
 
 # join daily hosts and aaily requests to find the average number of requests per host
-daily_hosts \
+print(daily_hosts \
     .join(daily_requests) \
     .map(lambda x: (x[0], x[1][0], x[1][1], x[1][1] / x[1][0])) \
     .sortBy(lambda x: x[0]) \
-    .collect()
+    .collect())
 
-time.sleep(3600)
+# time.sleep(3600)
 
