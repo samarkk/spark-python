@@ -23,14 +23,44 @@ sc = spark.sparkContext
 sc.setLogLevel('WARN')
 
 print('spark version {}, spark context version {}'.format(spark.version, sc.version))
-prop = {'user': 'root', 'password': 'abcd', 'driver': 'com.mysql.jdbc.Driver'}
-url = 'jdbc:mysql://asuspc.localdomain:3306/testdb'
 
-mockdf = spark.read.format('jdbc') \
-    .option('url', url) \
-    .option('dbtable', 'mocktbl') \
-    .option('user', 'root').option('password', 'abcd') \
-    .option('driver', 'com.mysql.cj.jdbc.Driver') \
-    .load()
-
+prop = {'user': 'root', 'password': 'puneetRai10198)', 'driver': 'com.mysql.jdbc.Driver'}
+url = 'jdbc:mysql://localhost:3306/testdb'
+mockdf = spark.read.format('jdbc').option('url', url).option('dbtable', 'mocktbl') \
+    .option('user', 'root').option('password', 'puneetRai10198)') \
+    .option('driver', 'com.mysql.jdbc.Driver').load()
 mockdf.show()
+
+
+mockdf.printSchema()
+
+mockdf.rdd.getNumPartitions()
+
+mockdf.groupBy('lname').count().show()
+
+mockdf_part = spark.read.format('jdbc').option('url', url).option('dbtable', 'mocktbl') \
+    .option('user', 'root').option('password', 'puneetRai10198)') \
+    .option('driver', 'com.mysql.jdbc.Driver') \
+    .option('partitionColumn', 'id').option('lowerBound', 0).option('upperBound', 1000) \
+    .option('numPartitions', 4).load()
+mockdf_part.show()
+
+mockdf_part.rdd.getNumPartitions()
+
+filter_query = "(select fname, lname from mocktbl where id between 10 and 20) fq"
+push_down_df = spark.read.jdbc(url=url, table=filter_query, properties=prop)
+push_down_df.show()
+
+push_down_df.explain()
+
+df_pushdown = spark.read.jdbc(table="mocktbl", url=url, properties=prop).where('id between 10 and 20')
+
+df_pushdown.explain()
+
+df_pushdown.show()
+
+mockdf.write.jdbc(url=url, mode='append', table='mocktblcp', properties=prop)
+
+spark.read.format('jdbc').option('url', url).option('dbtable', 'mocktblcp') \
+    .option('user', 'root').option('password', 'puneetRai10198)') \
+    .option('driver', 'com.mysql.jdbc.Driver').load().count()
