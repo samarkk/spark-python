@@ -13,6 +13,6 @@ create table if not exists testdb.mocktbl(
 
 set global local_infile=1;
 
-load data local infile '/home/samar/spark_python/resources/mock_data.csv'
+load data local infile '/home/samar/spark-python/resources/mock_data.csv'
 into table testdb.mocktbl fields terminated by ','
 lines terminated by '\n'  ignore 1 rows;
