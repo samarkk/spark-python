@@ -1,5 +1,4 @@
-# pyspark -packages com.datastax.spark:spark-cassandra-connector_2.12:3.0.0 --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions  --conf spark.cassandra.connection.host=localhost
-import os
+pyspark --conf spark.sql.extensions=com.datastax.spark.connector.CassandraSparkExtensions  --conf spark.cassandra.connection.host=localhost --packages com.datastax.spark:spark-cassandra-connector_2.12:3.0.1 import os
 import sys
 from sys import argv
 
