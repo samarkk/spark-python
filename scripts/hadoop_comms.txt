@@ -26,6 +26,6 @@ hdfs dfs -put /vagrant/shakespeare.txt
 hdfs dfs -ls 
 hdfs dfs -ls /user/vagrant
 hadoop jar /home/vagrant/hadoop-3.3.0/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.3.0.jar wordcount <input> <output>
-hive --service metastore 1>/dev/null 2&>1 &
+hive --service metastore 1>/dev/null 2>&1 &
 tail -f /tmp/vagrant/hive.log
 tlpg 9083
