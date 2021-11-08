@@ -1,0 +1,144 @@
+# go to centoshbase
+cd C:/vagpg/centoshbase
+# bring up the machines
+vagrant up admin master node1 node2
+# ssh into admin
+vagrant ssh admin
+# check machines are reachable
+nc -zv master 22
+nc -zv node1 22
+nc -zv node2 22
+# tmux 
+# create a new window
+Ctrl+b;c
+# click on the window to activate
+# rename a window
+ctrl+b;, -backspace and rename
+# horizontally split a window
+ctrl+b;_
+# vertical split a window
+ctrl+b;|
+# to go to a pane
+ctrl+b;click arrow in direction of pane
+ctrl+b;q;click the pane number that flashed
+# to type in all panes
+ctrl+b;:setw synchronize-panes
+--not in above just sync and pressing tab should populate the full command
+
+# set up hdfs
+# ensure data directories are clean
+ctrl+b;c
+-- divide into three panes
+-- ssh into master, node1 and node2 in the panes
+-- syncrhonize
+tree /home/vagrant/hadoopdata
+rm -rf /home/vagrant/hadoopdata/*/*
+
+### HBASE start
+start-hbase.sh
+### verify that hbase is started
+jps -l
+--- should see HQuormPeer, HMaster, HRegionServer
+### start the base shell on the admin machine
+# check the status
+status
+# get detailed status
+status 'detailed'
+# get version
+version
+# check the tables available
+list
+# get help on tables
+table_help
+# create a table to play around with two column families
+create 't1', 'f1', 'f2'
+# describe the created table
+describe 't1'
+# Syntax:  put <'tablename'>,<'rowname'>,<'columnvalue'>,<'value'>
+# put a row into the table without a quailfier
+put 't1', 'r1', 'f1', 'value'
+# put a row into the table with a family and qualifer
+put 't1', 'r1', 'f1:c1', 'r1f1c1v1'
+
+# put ten rows each with values for f1:c1 and f2:c1
+for x in 1..9 do 
+put 't1', "r#{x}", 'f1:c1', "r#{x}f1c1v#{x}"
+put 't1', "r#{x}", 'f1:c2', "r#{x}f1c1v#{x}"
+end
+
+# exercise - add rows from r11 to r20 with each having values for f1 and f2 to t1
+
+# retrieve data 
+# Syntax: get <'tablename'>, <'rowname'>, {< Additional parameters>}
+get 't1', 'r1'
+get 't1', 'r1', 'f1'
+get 't1', 'r1', 'f1:c1'
+get 't1', 'r1', {COLUMNS => ['f1','f2']}
+get 't1', 'r1'
+get 't1', 'r1', {COLUMN => 'f1:c1', VERSIONS => 5}
+
+# delete cells
+# Syntax:delete <'tablename'>,<'row name'>,<'column name'>
+delete 't1', 'r1', 'f1:c1'
+
+# to alter a table
+# here increasing number of versions for the column family to 5
+alter 't1', NAME=>'f1', VERSIONS => 5
+# alter add on a column to the table
+alter 't1', NAME=>'f3', VERSIONS => 3
+# alter table multiple add two new column families
+alter 't1', {NAME => 'f4'}, {NAME => 'f5'}
+# alter table remove a column family
+alter 't1', 'delete' => 'c3'
+# You can also change table-scope attributes like MAX_FILESIZE, READONLY,
+# MEMSTORE_FLUSHSIZE, NORMALIZATION_ENABLED, NORMALIZER_TARGET_REGION_COUNT,
+# NORMALIZER_TARGET_REGION_SIZE(MB), DURABILITY, etc. These can be put at the # end;
+# for example, to change the max size of a region to 128MB, do
+alter 't1', MAX_FILESIZE => '134217728'
+# remove table attribute
+alter 't1', METHOD => 'table_att_unset', NAME => 'MAX_FILESIZE'
+# count table rows
+# default interval is 1000
+count 't1', INTERVAL => 10000
+
+# to drop a table, disable and then drop
+is_enabled 't1'
+disable 't1'
+is_enabled 't1'
+drop 't1'
+
+# list the namespaces
+list_namespace
+# list the tables in a namespace
+list_namespace_tables 'hbase'
+# scan a namespace table
+scan 'hbase:meta'
+# look for regioninfo 
+scan 'hbase:meta', {FILTER => "QualifierFilter(=,'regexstring:regioninfo')"}
+# list regions for a table
+list_regions 't1'
+
+# see the files that make up hbase on hdfs
+hdfs dfs -ls /hbase
+hdfs dfs -ls /hbase/WALs
+-- there is a directory for each region server
+#  see the oldWALs directory on hdfs
+hdfs dfs -ls /hbase/oldWAL
+hdfs dfs -ls /hbase/oldWAL | wc -l
+# see the hbase id identifying the cluster
+hdfs dfs -cat /hbase/hbase.id
+# see the direcoties created for the new table
+hdfs dfs -ls -R /hbase/data/default/t1
+
+# load the fo table from code and then list regions
+# check the file system
+# split from the shell
+# check file system, list_regions
+split 'FOTABLEH'
+list_regions 'FOTABLEH'
+
+
+
+
+
+
