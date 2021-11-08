@@ -29,3 +29,4 @@ hadoop jar /home/vagrant/hadoop-3.3.0/share/hadoop/mapreduce/hadoop-mapreduce-ex
 hive --service metastore 1>/dev/null 2>&1 &
 tail -f /tmp/vagrant/hive.log
 tlpg 9083
+hadoop distcp  file:///home/vagrant/c/hiveexs/nse201819 /user/vagrant
