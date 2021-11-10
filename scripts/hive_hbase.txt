@@ -1,0 +1,48 @@
+# put data into hdfs
+hdfs dfs -mkdir cmdata
+hdfs dfs -put d/findataf/cm/cmcsv/cm01JAN2018bhav.csv cmdata
+hdfs dfs -put d/findataf/cm/cmcsv/cm02JAN2018bhav.csv cmdata
+hdfs dfs -put d/findataf/cm/cmcsv/cm03JAN2018bhav.csv cmdata
+
+# create a hive table linking to the data
+create table nsecm (
+  symbol string,
+  series string , openpr decimal, high decimal, low decimal,
+  closepr decimal, last decimal, prevclose decimal,
+  tottrdqty int, tottrdval decimal, timetrade string, tottrades int, isin string)
+  row format delimited
+  fields terminated by ','
+  location 'hdfs:///user/vagrant/cmdata'
+  tblproperties ('skip.header.line.count'='1');
+
+# create th hbase table
+create 'CMTBL', {NAME => 'F1', BLOOMFILTER => 'ROW', BLOCK_CACHE => true, COMPRESSION => 'snappy'}
+
+# create a hive table on top of the hbase table
+create external table EXT_CMTBL(id string, CPR decimal, QTY int, VAL decimal)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler' 
+WITH SERDEPROPERTIES ("hbase.columns.mapping" = ":key, F1:CPR, F1:QTY, F1:val") 
+TBLPROPERTIES("hbase.table.name" = "CMTBL");
+
+# populate the hive hbase linked table to push data into hbase
+insert into EXT_CMTBL
+select CONCAT( SUBSTRING(TIMETRADE,-4)  , '-' ,
+CASE WHEN SUBSTRING(TIMETRADE,4,3) = 'JAN' THEN 01
+WHEN SUBSTRING(TIMETRADE,4,3) = 'FEB' THEN 02
+WHEN SUBSTRING(TIMETRADE,4,3) = 'MAR' THEN 03
+WHEN SUBSTRING(TIMETRADE,4,3) = 'APR' THEN 04
+WHEN SUBSTRING(TIMETRADE,4,3) = 'MAY' THEN 05
+WHEN SUBSTRING(TIMETRADE,4,3) = 'JUN' THEN  06
+WHEN SUBSTRING(TIMETRADE,4,3) = 'JUL' THEN 07
+WHEN SUBSTRING(TIMETRADE,4,3) = 'AUG' THEN  08
+WHEN SUBSTRING(TIMETRADE,4,3) = 'SEP' THEN 09
+WHEN SUBSTRING(TIMETRADE,4,3) = 'OCT' THEN 10
+WHEN SUBSTRING(TIMETRADE,4,3) = 'NOV' THEN  11
+WHEN SUBSTRING(TIMETRADE,4,3) = 'DEC' THEN 12
+END , '-',SUBSTRING(TIMETRADE,0,2),symbol,'s',series) as id, 
+closepr as CPR, tottrdqty as QTY, tottrdval as VAL from nsecm limit 5;
+
+create external table EXT_FOTABLE(id string, CPR decimal, CNTRS int)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler' 
+WITH SERDEPROPERTIES ("hbase.columns.mapping" = ":key, D:CPR, D:CNTRS") 
+TBLPROPERTIES("hbase.table.name" = "FOTABLEH");
