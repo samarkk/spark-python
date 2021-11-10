@@ -1,5 +1,5 @@
 # To enable lz4 compression make directory lib/native under hbase and link Linux-amd64-64 to lib/native under hadoop
-mkdir /home/hadoop/hbase/lib/native
+mkdir /home/vagrant/hadoop/hbase/lib/native
 ln -s /home/vagrant/hadoop/lib/native/  /home/vagrant/hbase/lib/native/Linux-amd64-64
 
 # enable snappy compressiion
