@@ -1,0 +1,14 @@
+# To enable lz4 compression make directory lib/native under hbase and link Linux-amd64-64 to lib/native under hadoop
+mkdir /home/hadoop/hbase/lib/native
+ln -s /home/vagrant/hadoop/lib/native/  /home/vagrant/hbase/lib/native/Linux-amd64-64
+
+# enable snappy compressiion
+sudo yum install snappy-devel
+# check native library is  configured
+hbase --config /home/vagrant/hbase/conf org.apache.hadoop.util.NativeLibraryChecker
+# check compression is  working
+hbase org.apache.hadoop.hbase.util.CompressionTest hdfs://master.e4rlearning.com:8020/hbase/shakespeare.txt gz
+
+create 'ttbllz4', {NAME => 'f1', COMPRESSION => "lz4", EVICT_BLOCKS_ON_CLOSE => 'true', KEEP_DELETED_CELLS => 'true'}
+
+create 'FOTABLESNAPPY', {NAME => 'D1', COMPRESSION => "snappy", EVICT_BLOCKS_ON_CLOSE => 'true', KEEP_DELETED_CELLS => 'true'}
