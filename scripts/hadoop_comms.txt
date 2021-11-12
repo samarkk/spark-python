@@ -31,3 +31,53 @@ tail -f /tmp/vagrant/hive.log
 tlpg 9083
 hadoop distcp  file:///home/vagrant/c/hiveexs/nse201819 /user/vagrant
 HADOOP_CONF_DIR=/home/vagrant/hadoop/etc/hadoop spark-submit --master yarn
+
+HADOOP_CONF_DIR=/home/vagrant/hadoop/etc/hadoop/ pyspark --packages ch.cern.hbase.connectors.spark:hbase-spark:1.0.1_spark-3.0.1_4 --master yarn
+cd /home/vagrant/.m2/repository/org/apache/commons/commons-compress/1.4.1
+wget https://repo1.maven.org/maven2/org/apache/commons/commons-compress/1.4.1/commons-compress-1.4.1.jar
+cd /home/vagrant/.m2/repository/org/apache/hbase/thirdparty/hbase-shaded-protobuf/2.1.0
+wget https://repo1.maven.org/maven2/org/apache/hbase/thirdparty/hbase-shaded-protobuf/2.1.0/hbase-shaded-protobuf-2.1.0.jar
+cd /home/vagrant/.m2/repository/org/apache/hbase/thirdparty/hbase-shaded-miscellaneous/2.1.0
+wget https://repo1.maven.org/maven2/org/apache/hbase/thirdparty/hbase-shaded-miscellaneous/2.1.0/hbase-shaded-miscellaneous-2.1.0.jar
+cd /home/vagrant/.m2/repository/org/tukaani/xz/1.0
+wget https://repo1.maven.org/maven2/org/tukaani/xz/1.0/xz-1.0.jar
+cd /home/vagrant/.m2/repository/javax/xml/bind/jaxb-api/2.2.11
+wget https://repo1.maven.org/maven2/javax/xml/bind/jaxb-api/2.2.11/jaxb-api-2.2.11.jar
+cd /home/vagrant/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.13
+wget https://repo1.maven.org/maven2/org/codehaus/jackson/jackson-core-asl/1.9.13/jackson-core-asl-1.9.13.jar
+cd /home/vagrant/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.13
+wget https://repo1.maven.org/maven2/org/codehaus/jackson/jackson-mapper-asl/1.9.13/jackson-mapper-asl-1.9.13.jar
+cd /home/vagrant/.m2/repository/org/codehaus/jackson/jackson-jaxrs/1.9.13
+wget https://repo1.maven.org/maven2/org/codehaus/jackson/jackson-jaxrs/1.9.13/jackson-jaxrs-1.9.13.jar
+cd /home/vagrant/.m2/repository/org/codehaus/jackson/jackson-xc/1.9.13
+wget https://repo1.maven.org/maven2/org/codehaus/jackson/jackson-xc/1.9.13/jackson-xc-1.9.13.jar
+cd /home/vagrant/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.10.3
+wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-databind/2.10.3/jackson-databind-2.10.3.jar
+cd /home/vagrant/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.10.3
+wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-annotations/2.10.3/jackson-annotations-2.10.3.jar
+cd /home/vagrant/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.10.3
+wget https://repo1.maven.org/maven2/com/fasterxml/jackson/core/jackson-core/2.10.3/jackson-core-2.10.3.jar
+cd /home/vagrant/.m2/repository/commons-io/commons-io/2.6
+wget https://repo1.maven.org/maven2/commons-io/commons-io/2.6/commons-io-2.6.jar
+cd /home/vagrant/.m2/repository/asm/asm/3.1
+wget https://repo1.maven.org/maven2/asm/asm/3.1/asm-3.1.jar
+
+fodf_hb = spark.read.format("org.apache.hadoop.hbase.spark")\
+    .option("hbase.table", "FOTABLEH")\
+    .option("hbase.columns.mapping", """
+       STOCKINSTRU STRING :key, OPR STRING D:OPR,
+       HPR STRING D:HPR, LPR STRING D:LPR, CPR STRING D:CPR,
+       SPR STRING D:SPR
+       """)\
+    .option("hbase.spark.use.hbasecontext", False) \
+    .load()
+fodf_hb.show(20, False)
+create 'FOTABLEFMSPARK', {NAME => 'D', BLOOMFILTER => 'ROW', COMPRESSION => 'snappy', BLOCK_CACHE => true}
+fodf_hb.write.format("org.apache.hadoop.hbase.spark") \
+    .option('hbase.table', 'FOTABLEFMSPARK') \
+    .option("hbase.columns.mapping", """
+    STOCKINSTRU STRING :key, OPR STRING D:OPR,
+    HPR STRING D:HPR, LPR STRING D:LPR, CPR STRING D:CPR,
+    SPR STRING D:SPR
+    """ ) \
+    .save()
