@@ -30,3 +30,4 @@ hive --service metastore 1>/dev/null 2>&1 &
 tail -f /tmp/vagrant/hive.log
 tlpg 9083
 hadoop distcp  file:///home/vagrant/c/hiveexs/nse201819 /user/vagrant
+HADOOP_CONF_DIR=/home/vagrant/hadoop/etc/hadoop spark-submit --master yarn
