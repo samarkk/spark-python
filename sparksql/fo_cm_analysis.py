@@ -108,6 +108,63 @@ and symbol = 'TCS'
 order by symbol, to_timestamp(udf_mname_to_no(expiry_dt), "dd-MM-yyyy")
 """).show(1000, False)
 
+spark.conf.set('spark.sql.shuffle.partitions', 4)
+# save it as a dataframe
+spark.sql("""
+with pltbl as
+( select timestamp, symbol,expiry_dt,chg_in_oi,close,open_int,
+sum(chg_in_oi)
+over (partition by symbol,expiry_dt, instrument order by to_timestamp(udf_mname_to_no(timestamp), "dd-MM-yyyy")) as cum_chg_oi,
+sum(chg_in_oi*close)
+over ( partition by symbol,expiry_dt, instrument order by to_timestamp(udf_mname_to_no(timestamp), "dd-MM-yyyy"))
+as b_s_pl_status
+from fut_data
+where instrument like 'FUT%'
+ )
+select *, b_s_pl_status - open_int * close as fpl_status 
+from pltbl
+where upper(expiry_dt) = timestamp
+order by symbol, to_timestamp(udf_mname_to_no(expiry_dt), "dd-MM-yyyy")
+""").repartition(1).write.mode('overwrite').save('fo_pl_details')
+
+saved_fo_pl_df = spark.read.parquet('fo_pl_details')
+saved_fo_pl_df.show()
+
+spark.sql("""
+with pltbl as
+( select timestamp, symbol,expiry_dt,chg_in_oi,close,open_int,
+sum(chg_in_oi)
+over (partition by symbol,expiry_dt, instrument order by to_timestamp(udf_mname_to_no(timestamp), "dd-MM-yyyy")) as cum_chg_oi,
+sum(chg_in_oi*close)
+over ( partition by symbol,expiry_dt, instrument order by to_timestamp(udf_mname_to_no(timestamp), "dd-MM-yyyy"))
+as b_s_pl_status
+from fut_data
+where instrument like 'FUT%'
+ )
+select *, b_s_pl_status - open_int * close as fpl_status 
+from pltbl
+where upper(expiry_dt) = timestamp
+order by symbol, to_timestamp(udf_mname_to_no(expiry_dt), "dd-MM-yyyy")
+""").repartition(1).write.mode('overwrite').saveAsTable('fopltable')
+
+
+spark.sql("""
+with pltbl as
+( select timestamp, symbol,expiry_dt,chg_in_oi,close,open_int,
+sum(chg_in_oi)
+over (partition by symbol,expiry_dt, instrument order by to_timestamp(udf_mname_to_no(timestamp), "dd-MM-yyyy")) as cum_chg_oi,
+sum(chg_in_oi*close)
+over ( partition by symbol,expiry_dt, instrument order by to_timestamp(udf_mname_to_no(timestamp), "dd-MM-yyyy"))
+as b_s_pl_status
+from fut_data
+where instrument like 'FUT%'
+ )
+select *, b_s_pl_status - open_int * close as fpl_status 
+from pltbl
+where upper(expiry_dt) = timestamp
+order by symbol, to_timestamp(udf_mname_to_no(expiry_dt), "dd-MM-yyyy")
+""").repartition(1).write.mode('overwrite').option('path','foplextbl').saveAsTable('fopltableex')
+
 
 # carry out analysis 1 using dataframe api
 
