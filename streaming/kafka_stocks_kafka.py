@@ -25,6 +25,7 @@ split_col = split('VALUE', ',')
 stocks_df = stock_quotes.withColumn('symbol', split_col.getItem(0)) \
     .withColumn('qty', split_col.getItem(8)) \
     .withColumn('vlu', split_col.getItem(9)) \
+    .withColumn('clspr', split_col.getItem(5)) \
     .select('symbol', 'qty', 'vlu')
 
 stocks_aggregated = stocks_df.groupBy('symbol') \
