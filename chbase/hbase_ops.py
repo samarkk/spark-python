@@ -160,32 +160,39 @@ print([x for x in table.scan(filter="MultipleColumnPrefixFilter('colprefix', 'al
 # ColumnCountGetFilter
 # This filter takes one argument – a limit. It returns the first limit number of columns in the table.
 print([x for x in table.scan(filter="ColumnCountGetFilter(5) AND PrefixFilter('row-7')")])
+# scan 'mytable', {FILTER =>"ColumnCountGetFilter(5) AND PrefixFilter('row-7')"}
 
 # PageFilter
 # This filter takes one argument – a page size. It returns page size number of rows from the table
 print([x for x in table.scan(filter="PageFilter(10)")])
+# scan 'mytable', {FILTER =>"PageFilter(10)"}
 
 # ColumnPaginationFilter
 # This filter takes two arguments – a limit and offset.
 # It returns limit number of columns after offset number of columns. It does this for all the rows.
 print([x for x in table.scan(filter="ColumnPaginationFilter(3,2) AND PrefixFilter('row-7')")])
+# scan 'mytable', {FILTER =>"ColumnPaginationFilter(3,2) AND PrefixFilter('row-7')"}
 
 # InclusiveStopFilter
 # This filter takes one argument – a row key on which to stop scanning.
 # It returns all key-values present in rows up to and including the specified row.
 print([x for x in table.scan(filter="InclusiveStopFilter('row-2')")])
+# scan 'mytable', {FILTER =>"InclusiveStopFilter('row-2')"}
 
 # RowFilter
 # This filter takes a compare operator and a comparator.
 # It compares each row key with the comparator using the compare operator and if the comparison returns true,
 # it returns all the key-values in that row.
 print([x for x in table.scan(filter="RowFilter(=,'binary:row-7')")])
+# scan 'mytable', {FILTER =>"RowFilter(=,'binary:row-7')"}
 print([x for x in table.scan(filter="RowFilter(=,'substring:row-7')")])
+# scan 'mytable', {FILTER =>"RowFilter(=,'substring:row-7')"}
 
 # TimeStampsFilter
 # This filter takes a list of timestamps.
 # It returns those key-values whose timestamps matches any of the specified timestamps.
 print([x for x in table.scan(filter="RowFilter(=,'substring:row-7')",include_timestamp=True)])
+# scan 'mytable', {FILTER =>"RowFilter(=,'substring:row-7')"}
 print( [x for x in table.scan(filter="TimestampsFilter(1635645408997)", include_timestamp=True)])
 
 # Family Filter
@@ -193,19 +200,23 @@ print( [x for x in table.scan(filter="TimestampsFilter(1635645408997)", include_
 # It compares each column family name with the comparator using the compare operator and
 # if the comparison returns true, it returns all the Cells in that column family.
 print([x for x in table.scan(filter="FamilyFilter(=,'substring:cf1')")])
+# scan 'mytable', {FILTER =>"FamilyFilter(=,'substring:cf1')"}
 print([x for x in table.scan(filter="FamilyFilter(=,'substring:cf1') AND RowFilter(=,'substring:row-7')")])
+# scan 'mytable', {FILTER =>"FamilyFilter(=,'substring:cf1') AND RowFilter(=,'substring:row-7')"}
 
 # QualifierFilter
 # This filter takes a compare operator and a comparator.
 # It compares each qualifier name with the comparator using the compare operator and
 # if the comparison returns true, it returns all the key-values in that column.
 print([x for x in table.scan(filter="QualifierFilter(=,'substring:c70')")])
+# scan 'mytable', {FILTER =>"QualifierFilter(=,'substring:c70')"}
 
 # ValueFilter
 # This filter takes a compare operator and a comparator.
 # It compares each value with the comparator using the compare operator and
 # if the comparison returns true, it returns that key-value.
 print([x for x in table.scan(filter="ValueFilter(=,'regexstring:^ideval')")])
+# scan 'mytable', {FILTER =>"ValueFilter(=,'regexstring:^ideval')"}
 
 # DependentColumnFilter
 # This filter takes two arguments – a family and a qualifier.
@@ -214,6 +225,7 @@ print([x for x in table.scan(filter="ValueFilter(=,'regexstring:^ideval')")])
 # If the row doesn’t contain the specified column –
 # none of the key-values in that row will be returned.
 print([x for x in table.scan(filter="DependentColumnFilter('cf1','c11')")])
+# scan 'mytable', {FILTER =>"DependentColumnFilter('cf1','c11')"}
 
 # SingleColumnValueFilter
 # This filter takes a column family, a qualifier, a compare operator and a comparator.
@@ -226,11 +238,14 @@ print([x
         filter="SingleColumnValueFilter('cf1','c11',=,'regexstring:cf1-ideval-11')"
                               " AND RowFilter(=,'regexstring:row-[12]$')"
     )])
+# scan 'mytable', {FILTER =>"SingleColumnValueFilter('cf1','c11',=,'regexstring:cf1-ideval-11') AND RowFilter(=,'regexstring:row-[12]$')"}
 print([x
        for x in table.scan(
         filter="SingleColumnValueFilter('cf1','c11',!=,'regexstring:cf1-ideval-11')"
                " AND RowFilter(=,'regexstring:row-[12]$')"
     )])
+# scan 'mytable', {FILTER =>"SingleColumnValueFilter('cf1','c11',!=,'regexstring:cf1-ideval-11') AND RowFilter(=,'regexstring:row-[12]$')"}
+
 # SingleColumnValueExcludeFilter
 # This filter takes the same arguments and behaves same as SingleColumnValueFilter – however,
 # if the column is found and the condition passes,
@@ -240,6 +255,7 @@ print([x
         filter="SingleColumnValueExcludeFilter('cf1','c11',=,'regexstring:cf1-ideval-11')"
                " AND RowFilter(=,'regexstring:row-[12]$')"
     )])
+# scan 'mytable', {FILTER =>"SingleColumnValueExcludeFilter('cf1','c11',=,'regexstring:cf1-ideval-11') AND RowFilter(=,'regexstring:row-[12]$')"}
 
 # ColumnRangeFilter
 # This filter is used for selecting only those keys with columns that are between minColumn and maxColumn. I
@@ -247,13 +263,15 @@ print([x
 print([
     x for x in table.scan(filter="ColumnRangeFilter('c11',True,'c15',True)")
 ])
+# scan 'mytable', {FILTER =>"ColumnRangeFilter('c11',True,'c15',True)"}
 
 # Logical Filters SKIP and WHILE
 #SKIP - For a particular row, if any of the key-values fail the filter condition, the entire row is skipped.
 print([x for x in table.scan(filter="SKIP ValueFilter(=,'regexstring:.*ideval-9')")])
-
+# scan 'mytable', {FILTER =>"SKIP ValueFilter(=,'regexstring:.*ideval-9')"}
 # WHILE - For a particular row, key-values will be emitted
 # until a key-value is reached that fails the filter condition.
 print([
     x for x in table.scan(filter="WHILE RowFilter(!=,'substring:row-0004')")
 ])
+# scan 'mytable', {FILTER =>"WHILE RowFilter(!=,'substring:row-0004')"}
