@@ -1,5 +1,7 @@
 You will work with the futures and options end of day from nseindia.com.
+
 The put call ratio is considered as a market direction indicator. Above 0.8 it ndicates bullishness and above 1.2 extreme bullishness. Likewise below 0.8 and 0.6 indicate bearishness and extreme bearishness respectively
+
 Load the data from the s3 bucket folder located at s3a://databkt31/fod
 Drop the extra column and convert the timestamp columns and expiry_dt columns to date columns
 You will have to create this program and execute it using spark-submit
