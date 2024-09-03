@@ -10,7 +10,7 @@ You will have to create this program and execute it using spark-submit
 
 To modularize the functinality add the date converther helper function we have been using mnameToNo to a s3 location andd add that directory using the sc.addFile method, and ensure providing the recursive option
 
-Filter the data to include only option_typ CE and aggregate the sum of open interest calling the aggregated column totce for the transformed data by symbol, converted expiry date column, converted date column
+Filter the data to include only option_typ CE and aggregate the sum of open interest calling the aggregated column totce for the transformed data by symbol, converted expiry date column, converted date column, option_typ column. That is you have to group the data by sybmol, converted expiry date column, converted date column, option_typ column
 
 Repeat the above step for option_typ PE - group by same columns and call sum of open_int totpe
 
