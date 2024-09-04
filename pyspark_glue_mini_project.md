@@ -34,4 +34,4 @@ add a file to the source location and verify that the job is invoked through the
 
 use a crawler to create a table for the target destination
 
-verifyin athena that the table has the analuzed data and as you add files the lambda function is triggered, the glue job is executed and the data is augmented as given by the row count in athena
+verify in athena that the table has the anayzed data and as you add files the lambda function is triggered, the glue job is executed and the data is augmented as given by the row count in athena
