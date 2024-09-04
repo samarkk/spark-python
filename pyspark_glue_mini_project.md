@@ -6,6 +6,8 @@ create a source bucket where you will add the files from s3://databkt31/fod loca
 
 create a lambda function which will be triggered when the file is added to the source bucket
 
+use the files in the fod directory under the root c folder to develop and verify the lambda function
+
 create a destination bucket where the analzyed data will be stored by the glue job that will be invoked through the triggered lambda function
 
 In the lambda function generate the source and destination locations. The destination location should have a partitioned structure with directories named dt=yyyy-mm-dd eg fo01JUN2023bhav.csv.gz analyzed data should go to dt=2023-06-01 folder
@@ -29,3 +31,7 @@ Join the two to add a pcr column as totpe / totce
 write the analzyed, joined data to the target location
 
 add a file to the source location and verify that the job is invoked through the triggered lambda function and the correct output written to the target bucket
+
+use a crawler to create a table for the target destination
+
+verifyin athena that the table has the analuzed data and as you add files the lambda function is triggered, the glue job is executed and the data is augmented as given by the row count in athena
